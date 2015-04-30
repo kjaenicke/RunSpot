@@ -1,74 +1,66 @@
 const React = require('react');
+const _ = require('underscore');
+const Album = require('./album');
 const SearchStore = require('../stores/SearchStore');
 const SearchActionCreator = require('../actions/SearchActionCreator');
-const _ = require('underscore');
 
-let App = React.createClass({
+class App extends React.Component {
 
-  getInitialState() {
-    return {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      searchTerm: '',
       searchResults: []
-    }
-  },
+    };
+  }
 
-  _onChange() {
+  _onChange(){
     this.setState({ searchResults: SearchStore.get() });
-    console.log(this.state);
-  },
+  }
 
-  componentDidMount() {
-    SearchStore.addChangeListener(this._onChange);
-  },
+  componentDidMount(){
+    SearchStore.addChangeListener(this._onChange.bind(this));
+    console.log('testing');
+  }
 
-  componentWillUnmount() {
-    SearchStore.removeChangeListener(this._onChange);
-  },
+  componentWillUnmount(){
+    SearchStore.removeChangeListener(this._onChange.bind(this));
+  }
 
-  handleSearchChanged(e) {
-    _.throttle(SearchActionCreator.doSearch(e.target.value), 200);
-  },
+  handleSearchChanged(e){
+    this.setState({ searchTerm: e.target.value });
+  }
+
+  handleSubmit(e){
+    SearchActionCreator.doSearch(this.state.searchTerm);
+    this.setState({ searchTerm: '' });
+  }
 
   render() {
-    var albums = this.state.searchResults.map(function(album){
-        return <Album album={album} />
-    });
-
-    var myStyle = {
-      marginTop: '50px'
-    };
+    let albums = this.state.searchResults.map(album => <Album album={album} />);
+    let myStyle = { marginTop: '50px' };
 
     return (
       <div className="container runspot">
         <h1>RunSpot</h1>
-        <div className="row" style={ myStyle }>
+        <div className="row">
           <div className="col-xs-12">
-            <div className="input-group input-lg col-xs-12">
-              <input type="text" className="form-control" onChange={ this.handleSearchChanged } placeholder="Search for..." />
+            <div className="input-group">
+              <input type="text" className="form-control" value={this.state.searchTerm} onChange={ this.handleSearchChanged.bind(this) } placeholder="Search for..." />
+              <span className="input-group-btn">
+                <button className="btn btn-default" onClick={ this.handleSubmit.bind(this) } type="button">Search</button>
+              </span>
             </div>
           </div>
         </div>
-        <div className="row">
+        <div className="row" style={ myStyle }>
            { albums }
         </div>
       </div>
     );
   }
 
-});
-
-var Album = React.createClass({
-  render: function(){
-      return (
-        <div className="col-xs-3 album">
-          <a href="#" className="thumbnail">
-            <img src={ this.props.album.images[0].url } />
-            <div className="album-name">
-              { this.props.album.name }
-            </div>
-          </a>
-        </div>
-    );
-  }
-});
+}
 
 module.exports = App;

@@ -25,7 +25,6 @@ function fetchResults(searchValue) {
   })
 }
 
-// Facebook style store creation.
 let SearchStore = assign({}, BaseStore, {
 
   // public methods used by Controller-View to operate on data
