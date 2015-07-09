@@ -1,6 +1,6 @@
 const React = require('react');
 const _ = require('underscore');
-const Album = require('./album');
+const Track = require('./track');
 const SearchStore = require('../stores/SearchStore');
 const SearchActionCreator = require('../actions/SearchActionCreator');
 
@@ -21,7 +21,6 @@ class App extends React.Component {
 
   componentDidMount(){
     SearchStore.addChangeListener(this._onChange.bind(this));
-    console.log('testing');
   }
 
   componentWillUnmount(){
@@ -38,7 +37,7 @@ class App extends React.Component {
   }
 
   render() {
-    let albums = this.state.searchResults.map(album => <Album album={album} />);
+    let tracks = this.state.searchResults.map(track => <Track track={track} />);
     let myStyle = { marginTop: '50px' };
 
     return (
@@ -54,13 +53,37 @@ class App extends React.Component {
             </div>
           </div>
         </div>
-        <div className="row" style={ myStyle }>
-           { albums }
-        </div>
+        <table className="table table-striped table-bordered table-condensed">
+          <thead>
+            <tr>
+              <th>Album</th>
+              <th>Track Number</th>
+              <th>Track Name</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody>
+            { tracks }
+          </tbody>
+        </table>
       </div>
     );
   }
 
+  // <div className="row">
+  //   <div className="col-xs-12">
+  //     <div className="input-group">
+  //       <input type="text" className="form-control" value={this.state.searchTerm} onChange={ this.handleSearchChanged.bind(this) } placeholder="Search for..." />
+  //       <span className="input-group-btn">
+  //         <button className="btn btn-default" onClick={ this.handleSubmit.bind(this) } type="button">Search</button>
+  //       </span>
+  //     </div>
+  //   </div>
+  // </div>
+  // <div className="row" style={ myStyle }>
+  //    { albums }
+  // </div>
+  //
 }
 
 module.exports = App;

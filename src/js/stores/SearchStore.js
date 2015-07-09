@@ -6,23 +6,45 @@ const BaseStore = require('./BaseStore');
 const assign = require('object-assign');
 const $ = require('jquery');
 
+const PlaylistGenerator = require('../playlistGenerator');
+
 // data storage
+var playlistGenerator = new PlaylistGenerator();
+var _currentArtistID = '';
+var _relatedArtists = [];
 var _searchResults = [];
 
 // add private functions to modify data
 function fetchResults(searchValue) {
-  $.ajax({
-    dataType: 'json',
-    type: 'GET',
-    url: 'https://api.spotify.com/v1/search?q=' + encodeURIComponent(searchValue) + '&type=album',
-    success: function(data){
-      if(data){
-        _searchResults = data.albums.items;
-      }
+  let $def = $.Deferred();
+  let aggrQ = [];
 
-      SearchStore.emitChange();
-    }
-  })
+  playlistGenerator.searchForArtist(searchValue).done(function(curArtistID){
+    // set artist id
+    _currentArtistID = curArtistID;
+
+    playlistGenerator.getRelatedArtists(curArtistID).done(function(artists){
+      // set related artists
+      _relatedArtists = artists;
+
+      //queue up each top track search for related artists
+      artists.map((a) => aggrQ.push(playlistGenerator.getTopTracksForArtist(a.id)));
+
+      $.when(aggrQ).done(function(tracksArray){
+        _searchResults = [];
+
+        //Get all of the top albums for the related artists
+        tracksArray.map((ta) => ta.done(function(tracks){
+          _searchResults.push(tracks[Math.round(Math.random()*10)]);
+        }).then(function(){
+            SearchStore.emitChange();
+        }));
+      });
+
+    });
+  });
+
+  return $def;
 }
 
 let SearchStore = assign({}, BaseStore, {
