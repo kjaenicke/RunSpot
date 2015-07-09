@@ -31,8 +31,13 @@ class App extends React.Component {
     this.setState({ searchTerm: e.target.value });
   }
 
+  handleDurationChanged(e){
+    this.setState({ duration: e.target.value });
+  }
+
   handleSubmit(e){
-    SearchActionCreator.doSearch(this.state.searchTerm);
+    SearchActionCreator.doSearch({ searchTerm: this.state.searchTerm, duration: this.state.duration });
+
     this.setState({ searchTerm: '' });
   }
 
@@ -44,7 +49,12 @@ class App extends React.Component {
       <div className="container runspot">
         <h1>RunSpot</h1>
         <div className="row">
-          <div className="col-xs-12">
+          <div className="col-xs-3">
+            <div className="input-group">
+              <input type="text" className="form-control" value={this.state.duration} onChange={ this.handleDurationChanged.bind(this) } placeholder="Duration" />
+            </div>
+          </div>
+          <div className="col-xs-9">
             <div className="input-group">
               <input type="text" className="form-control" value={this.state.searchTerm} onChange={ this.handleSearchChanged.bind(this) } placeholder="Search for..." />
               <span className="input-group-btn">
@@ -57,8 +67,9 @@ class App extends React.Component {
           <thead>
             <tr>
               <th>Album</th>
-              <th>Track Number</th>
               <th>Track Name</th>
+              <th>Artist Name</th>
+              <th>Track Number</th>
               <th>Duration</th>
             </tr>
           </thead>

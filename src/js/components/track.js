@@ -29,8 +29,9 @@ class Track extends React.Component {
                 </a>
               </div>
             </td>
-            <td>{ this.props.track.track_number }</td>
             <td>{ this.props.track.name }</td>
+            <td>{ this.props.track.artists[0].name }</td>
+            <td>{ this.props.track.track_number }</td>
             <td>{ durationString }</td>
           </tr>
         );
