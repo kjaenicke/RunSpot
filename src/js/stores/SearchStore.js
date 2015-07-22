@@ -36,6 +36,7 @@ function fetchResults(searchObj) {
 
       //queue up each top track search for related artists
       artists.map((a) => aggrQ.push(playlistGenerator.getTopTracksForArtist(a.id)));
+      aggrQ.push(playlistGenerator.getTopTracksForArtist(_currentArtistID));
 
       $.when.apply($, aggrQ).done(function(){
         _searchResults = [];
